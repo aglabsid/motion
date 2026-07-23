@@ -1,35 +1,35 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react'
 import {
   AbsoluteFill,
   Easing,
-  continueRender,
-  delayRender,
+  Sequence,
   interpolate,
   useCurrentFrame,
-} from 'remotion';
-import {loadFont} from '@remotion/google-fonts/Gabarito';
+} from 'remotion'
+import { Audio } from '@remotion/media'
+import { ding, whoosh } from '@remotion/sfx'
+import { getLength } from '@remotion/paths'
+import { loadFont } from '@remotion/google-fonts/Gabarito'
 
-const {fontFamily} = loadFont();
+const { fontFamily } = loadFont('normal', { weights: ['700'] })
 
-const BACKGROUND = '#F8FAFC';
-const BRAND_BLUE = '#135AA6';
+const BACKGROUND = '#F8FAFC'
+const BRAND_BLUE = '#135AA6'
 
 // Timing (60fps)
-const DRAW_STAGGER = 8; // frames between each path starting
-const DRAW_DURATION = 110; // frames each path takes to draw
-const FILL_START = 136; // stroke -> fill cross-fade
-const FILL_DURATION = 44;
-const TEXT_START = 176; // brand name enters as logo settles
-const TEXT_DURATION = 40;
+const DRAW_STAGGER = 8 // frames between each path starting
+const DRAW_DURATION = 110 // frames each path takes to draw
+const FILL_START = 136 // stroke -> fill cross-fade
+const FILL_DURATION = 44
+const TEXT_START = 176 // brand name enters as logo settles
+const TEXT_DURATION = 40
 
 type LogoPath = {
-  d: string;
-  fill: string;
-  stroke: string;
-  fillRule?: 'evenodd';
-  // Stroke exists only for the draw-on effect; fade it out once filled
-  strokeFadesOut?: boolean;
-};
+  d: string
+  fill: string
+  stroke: string
+  fillRule?: 'evenodd'
+}
 
 // Paths from assets/logo.svg (1024x1024 viewBox), in draw order:
 // main swoosh -> inner arc -> detail strokes -> dot
@@ -55,25 +55,17 @@ const LOGO_PATHS: LogoPath[] = [
     stroke: BRAND_BLUE,
     fillRule: 'evenodd',
   },
-];
+]
 
-const DrawnPath: React.FC<{path: LogoPath; index: number; frame: number}> = ({
+const PATH_LENGTHS = LOGO_PATHS.map((path) => getLength(path.d))
+
+const DrawnPath: React.FC<{ path: LogoPath; index: number; frame: number }> = ({
   path,
   index,
   frame,
 }) => {
-  const ref = useRef<SVGPathElement>(null);
-  const [length, setLength] = useState<number | null>(null);
-  const [handle] = useState(() => delayRender(`measure path ${index}`));
-
-  useEffect(() => {
-    if (ref.current) {
-      setLength(ref.current.getTotalLength());
-    }
-    continueRender(handle);
-  }, [handle]);
-
-  const start = index * DRAW_STAGGER;
+  const length = PATH_LENGTHS[index]
+  const start = index * DRAW_STAGGER
   const drawProgress = interpolate(
     frame,
     [start, start + DRAW_DURATION],
@@ -82,15 +74,15 @@ const DrawnPath: React.FC<{path: LogoPath; index: number; frame: number}> = ({
       extrapolateLeft: 'clamp',
       extrapolateRight: 'clamp',
       easing: Easing.out(Easing.cubic),
-    }
-  );
+    },
+  )
 
   const fillOpacity = interpolate(
     frame,
     [FILL_START, FILL_START + FILL_DURATION],
     [0, 1],
-    {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}
-  );
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  )
 
   // Stroke starts bold for visibility while drawing, settles to the
   // original 1px once the fill takes over.
@@ -98,37 +90,33 @@ const DrawnPath: React.FC<{path: LogoPath; index: number; frame: number}> = ({
     frame,
     [FILL_START, FILL_START + FILL_DURATION],
     [4, 1],
-    {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}
-  );
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  )
 
   return (
     <path
-      ref={ref}
       d={path.d}
       fill={path.fill}
       fillRule={path.fillRule}
       clipRule={path.fillRule}
       fillOpacity={path.fill === 'none' ? undefined : fillOpacity}
       stroke={path.stroke}
-      strokeOpacity={path.strokeFadesOut ? 1 - fillOpacity : undefined}
       strokeWidth={strokeWidth}
-      strokeDasharray={length ?? undefined}
-      strokeDashoffset={length !== null ? length * (1 - drawProgress) : undefined}
-      // Hide until measured so the un-dashed full stroke never flashes
-      opacity={length === null ? 0 : 1}
+      strokeDasharray={length}
+      strokeDashoffset={length * (1 - drawProgress)}
     />
-  );
-};
+  )
+}
 
 export const LogoReveal: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useCurrentFrame()
 
   const textOpacity = interpolate(
     frame,
     [TEXT_START, TEXT_START + TEXT_DURATION],
     [0, 1],
-    {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}
-  );
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  )
   const textY = interpolate(
     frame,
     [TEXT_START, TEXT_START + TEXT_DURATION],
@@ -137,8 +125,8 @@ export const LogoReveal: React.FC = () => {
       extrapolateLeft: 'clamp',
       extrapolateRight: 'clamp',
       easing: Easing.out(Easing.cubic),
-    }
-  );
+    },
+  )
 
   return (
     <AbsoluteFill
@@ -150,6 +138,12 @@ export const LogoReveal: React.FC = () => {
         gap: 80,
       }}
     >
+      <Sequence name="Whoosh (draw-on)" layout="none">
+        <Audio src={whoosh} volume={0.8} />
+      </Sequence>
+      <Sequence name="Ding (text enters)" from={TEXT_START} layout="none">
+        <Audio src={ding} volume={0.4} />
+      </Sequence>
       <svg width={640} height={640} viewBox="0 0 1024 1024" fill="none">
         {LOGO_PATHS.map((path, i) => (
           <DrawnPath key={i} path={path} index={i} frame={frame} />
@@ -169,5 +163,5 @@ export const LogoReveal: React.FC = () => {
         aglabs.id
       </div>
     </AbsoluteFill>
-  );
-};
+  )
+}
