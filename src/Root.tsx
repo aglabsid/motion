@@ -1,5 +1,5 @@
 import {Composition} from 'remotion';
-import {LogoReveal} from './LogoReveal';
+import {LogoReveal} from './compositions/LogoReveal';
 
 export const Root: React.FC = () => {
   return (
