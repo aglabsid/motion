@@ -6,7 +6,8 @@
     "dev": "remotion studio",
     "render": "remotion render LogoReveal out/logo-reveal.mp4 --crf=18",
     "render:bot": "remotion render BotIntro out/bot-intro.mp4 --crf=18",
-    "render:ctros": "remotion render CtrosIntro out/ctros-intro.mp4 --crf=18"
+    "render:ctros": "remotion render CtrosIntro out/ctros-intro.mp4 --crf=18",
+    "render:all": "bun run render && bun run render:bot && bun run render:ctros"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.0",
