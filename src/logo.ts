@@ -1,10 +1,14 @@
 export const BRAND_BLUE = '#135AA6'
 
-// Accent + surface colors taken from bot.aglabs.id's stylesheet.
-export const BOT_ACCENT = '#4C8DF6' // oklch(67.47% .1726 259.49)
-export const BOT_BG = '#0F1729' // oklch(20.8% .042 265.755)
-export const BOT_SURFACE = '#1B2438' // oklch(29.23% .0626 270.49)
-export const BOT_TEXT = '#DCE6F7' // oklch(93.46% .0305 255.11)
+// bot.aglabs.id is neobrutalist: a light grid, hard black borders and
+// offset shadows with no blur. Colors are its stylesheet's light theme.
+export const BOT_ACCENT = '#4C8DF6' // --main
+export const BOT_BG = '#E5E5E5' // page behind the grid
+export const BOT_SURFACE = '#FFFFFF' // --secondary-background
+export const BOT_TEXT = '#0F1729' // --foreground
+export const BOT_BORDER = '#0F1729' // --border, drawn as a hard 4px rule
+export const BOT_GRID = '#80808033' // 48px grid lines, doubled for 1080w
+export const BOT_SHADOW = '12px 12px 0px 0px ' + BOT_BORDER
 
 export type LogoPath = {
   d: string

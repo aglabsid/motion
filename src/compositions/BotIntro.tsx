@@ -13,7 +13,15 @@ import { Audio } from '@remotion/media'
 import { ding, mouseClick, uiSwitch, whoosh } from '@remotion/sfx'
 import { loadFont as loadHeading } from '@remotion/google-fonts/Gabarito'
 import { loadFont as loadMono } from '@remotion/google-fonts/JetBrainsMono'
-import { BOT_ACCENT, BOT_BG, BOT_SURFACE, BOT_TEXT } from '../logo'
+import {
+  BOT_ACCENT,
+  BOT_BG,
+  BOT_BORDER,
+  BOT_GRID,
+  BOT_SHADOW,
+  BOT_SURFACE,
+  BOT_TEXT,
+} from '../logo'
 import { Cursor } from '../Cursor'
 
 const heading = loadHeading('normal', { weights: ['700', '900'] }).fontFamily
@@ -70,10 +78,14 @@ const Boot: React.FC = () => {
           fontFamily: mono,
           fontSize: 34,
           letterSpacing: '0.18em',
-          color: '#4ADE80',
+          color: BOT_TEXT,
           display: 'flex',
           alignItems: 'center',
           gap: 18,
+          padding: '20px 36px',
+          backgroundColor: BOT_SURFACE,
+          border: `4px solid ${BOT_BORDER}`,
+          boxShadow: BOT_SHADOW,
           opacity: interpolate(frame, [130, 156], [0, 1], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
@@ -90,7 +102,7 @@ const Boot: React.FC = () => {
             width: 18,
             height: 18,
             borderRadius: 999,
-            backgroundColor: '#4ADE80',
+            backgroundColor: BOT_ACCENT,
             opacity: frame % 84 > 58 ? 0.35 : 1,
           }}
         />
@@ -112,9 +124,12 @@ const Brand: React.FC = () => {
         style={{
           width: 440,
           height: 440,
-          // The PNG is already a circle on transparency, so no card behind it.
+          // Circle with a hard border; the PNG's own square corners clip away.
+          backgroundColor: BOT_SURFACE,
           borderRadius: 999,
-          boxShadow: `0 40px 120px ${BOT_ACCENT}55`,
+          border: `4px solid ${BOT_BORDER}`,
+          boxShadow: BOT_SHADOW,
+          overflow: 'hidden',
           opacity: interpolate(frame, [0, 18], [0, 1], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
@@ -137,8 +152,11 @@ const Brand: React.FC = () => {
           fontFamily: heading,
           fontWeight: 900,
           fontSize: 132,
-          color: '#FFFFFF',
+          color: BOT_TEXT,
           letterSpacing: '-0.01em',
+          textDecoration: 'underline',
+          textDecorationThickness: 8,
+          textUnderlineOffset: 16,
           opacity: interpolate(frame, [40, 72], [0, 1], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
@@ -183,11 +201,10 @@ const Bubble: React.FC<{ message: (typeof MESSAGES)[number] }> = ({
         alignSelf: isBot ? 'flex-start' : 'flex-end',
         maxWidth: 680,
         padding: '32px 42px',
-        borderRadius: 44,
-        borderBottomLeftRadius: isBot ? 12 : 44,
-        borderBottomRightRadius: isBot ? 44 : 12,
         backgroundColor: isBot ? BOT_SURFACE : BOT_ACCENT,
-        color: isBot ? BOT_TEXT : '#FFFFFF',
+        border: `4px solid ${BOT_BORDER}`,
+        boxShadow: BOT_SHADOW,
+        color: BOT_TEXT,
         fontFamily: mono,
         fontSize: 38,
         lineHeight: 1.35,
@@ -241,11 +258,11 @@ const Cta: React.FC = () => {
         style={{
           fontFamily: mono,
           fontSize: 56,
-          color: '#FFFFFF',
+          color: BOT_TEXT,
           backgroundColor: BOT_ACCENT,
           padding: '40px 80px',
-          borderRadius: 28,
-          boxShadow: `0 30px 90px ${BOT_ACCENT}55`,
+          border: `4px solid ${BOT_BORDER}`,
+          boxShadow: BOT_SHADOW,
           opacity: interpolate(frame, [0, 26], [0, 1], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
@@ -297,19 +314,13 @@ const Cta: React.FC = () => {
 }
 
 export const BotIntro: React.FC = () => {
-  const frame = useCurrentFrame()
-
   return (
     <AbsoluteFill style={{ backgroundColor: BOT_BG }}>
-      {/* Accent glow drifts with the scene cuts so the background never sits flat. */}
+      {/* The site's 48px grid, doubled so it reads at 1080px wide. */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(60% 40% at 50% ${interpolate(
-            frame,
-            [BOOT, CTA],
-            [35, 65],
-            { extrapolateRight: 'clamp' },
-          )}%, ${BOT_ACCENT}2E, transparent)`,
+          backgroundImage: `linear-gradient(90deg, ${BOT_GRID} 2px, transparent 2px), linear-gradient(${BOT_GRID} 2px, transparent 2px)`,
+          backgroundSize: '96px 96px',
         }}
       />
 
