@@ -17,7 +17,10 @@ import { loadFont as loadEmoji } from '@remotion/google-fonts/NotoColorEmoji'
 import { Cursor } from '../Cursor'
 
 const heading = loadHeading('normal', { weights: ['700', '900'] }).fontFamily
-const mono = loadMono('normal', { weights: ['400', '700'] }).fontFamily
+const mono = loadMono('normal', {
+  weights: ['400', '700'],
+  subsets: ['latin'],
+}).fontFamily
 // Pinned so emoji look identical on every machine, not like the host OS set.
 const emoji = loadEmoji('normal', { weights: ['400'], subsets: ['emoji'] })
   .fontFamily
