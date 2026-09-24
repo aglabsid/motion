@@ -434,21 +434,29 @@ const Cta: React.FC = () => {
 }
 
 export const CtrosIntro: React.FC = () => {
-  const frame = useCurrentFrame()
-
   return (
     <AbsoluteFill style={{ backgroundColor: BG }}>
-      {/* Accent glow drifts with the scene cuts so the background never sits flat. */}
+      {/* The site frames its content in a column between two border rules and
+          fills the leftover space with a -45deg hatch. Both are rebuilt here. */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(62% 40% at 50% ${interpolate(
-            frame,
-            [HERO, CTA],
-            [38, 62],
-            { extrapolateRight: 'clamp' },
-          )}%, ${ACCENT}26, transparent)`,
+          borderLeft: `3px solid ${BORDER}`,
+          borderRight: `3px solid ${BORDER}`,
+          margin: '0 72px',
         }}
       />
+      {[0, 1].map((i) => (
+        <AbsoluteFill
+          key={i}
+          style={{
+            top: i === 0 ? 150 : undefined,
+            bottom: i === 0 ? undefined : 150,
+            height: 96,
+            margin: '0 75px',
+            backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 14px, ${BORDER} 14px, ${BORDER} 16px)`,
+          }}
+        />
+      ))}
 
       <Sequence name="Scene: Hero" from={HERO} durationInFrames={FEATURES}>
         <Hero />
